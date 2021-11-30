@@ -1,12 +1,8 @@
 /* istanbul ignore file */
-const ServersTestHelper = {
-  async getAccessTokenAndUserId({
-    server,
-    username = 'dicoding',
-  }) {
+const ServerTestHelper = {
+  async getAccessTokenAndUserIdHelper({ server, username = 'dicoding' }) {
     const userPayload = {
-      username,
-      password: 'secret',
+      username, password: 'secret',
     };
 
     const responseUser = await server.inject({
@@ -14,7 +10,7 @@ const ServersTestHelper = {
       url: '/users',
       payload: {
         ...userPayload,
-        fullname: 'Dicoding Indonesia',
+        fullname: 'placeholder fullname',
       },
     });
 
@@ -30,4 +26,4 @@ const ServersTestHelper = {
   },
 };
 
-module.exports = ServersTestHelper;
+module.exports = ServerTestHelper;
