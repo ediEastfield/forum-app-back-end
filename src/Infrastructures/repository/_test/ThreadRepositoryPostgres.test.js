@@ -2,9 +2,10 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const NewThread = require('../../../Domains/threads/entities/NewThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
+const DetailThread = require('../../../Domains/threads/entities/DetailThread');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
-const { findThreadsById } = require('../../../../tests/ThreadsTableTestHelper');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('ThreadRepositoryPostgres', () => {
   afterEach(async () => {
@@ -52,6 +53,49 @@ describe('ThreadRepositoryPostgres', () => {
         owner: 'user-123',
       }));
       expect(threads).toBeDefined();
+    });
+  });
+
+  describe('getThreadById function', () => {
+    it('should return NotFoundError when thread is not found', async () => {
+      // Arrange
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
+
+      // Action and Assert
+      await expect(threadRepositoryPostgres.getThreadById('thread-x'))
+        .rejects
+        .toThrowError(NotFoundError);
+    });
+
+    it('should return thread when is found', async () => {
+      // Arrange
+      const newThread = {
+        id: 'thread-123',
+        title: 'sebuah thread',
+        body: 'belajar back end',
+        date: '2021',
+        owner: 'user-123',
+      };
+
+      const expectedThread = {
+        id: 'thread-123',
+        title: 'sebuah thread',
+        body: 'belajar back end',
+        date: '2021',
+        owner: 'user-123',
+      };
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread(newThread);
+
+      // Action
+      const getThread = await threadRepositoryPostgres.getThreadById('thread-123');
+
+      // Assert
+      expect(getThread).toStrictEqual(expectedThread);
     });
   });
 });

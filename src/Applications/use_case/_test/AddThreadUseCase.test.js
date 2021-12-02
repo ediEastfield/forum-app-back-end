@@ -5,7 +5,7 @@ const AuthenticationTokenManager = require('../../security/AuthenticationTokenMa
 const AddThreadUseCase = require('../AddThreadUseCase');
 
 describe('AddThreadUseCase', () => {
-  it('should orchestrating the add user action correctly', async () => {
+  it('should orchestrating the add thread action correctly', async () => {
     // Arrange
     const useCasePayload = {
       title: 'sebuah thread',
