@@ -12,8 +12,8 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   afterAll(async () => {
-    await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
+    await CommentsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
     await pool.end();
   });
@@ -52,6 +52,135 @@ describe('CommentRepositoryPostgres', () => {
         owner: 'user-123',
       }));
       expect(comments).toBeDefined();
+    });
+  });
+
+  describe('checkCommentIsExist function', () => {
+    it('should resolve if comment exists', async () => {
+      // Arrange
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.checkCommentIsExist({
+        threadId: 'thread-123',
+        commentId: 'comment-123',
+      })).resolves.not.toThrowError();
+    });
+
+    it('should reject if comment does not exist', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.checkCommentIsExist({
+        threadId: 'thread-123',
+        commentId: 'comment-456',
+      })).rejects.toThrowError('komentar yang anda cari tidak ditemukan');
+    });
+
+    it('should reject if comment is already deleted', async () => {
+      // Arrange
+      await CommentsTableTestHelper.addComment({
+        id: 'commet-123',
+        isDeleted: true,
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.checkCommentIsExist({
+        threadId: 'thread-123',
+        commentId: 'comment-123',
+      })).rejects.toThrowError('komentar yang anda cari tidak ditemukan');
+    });
+  });
+
+  describe('verifyCommentAccess', () => {
+    it('should not throw error if user has authorization', async () => {
+      // Arrange
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.verifyCommentAccess({
+        commentId: 'comment-123',
+        ownerId: 'user-123',
+      })).resolves.toBeUndefined();
+    });
+
+    it('should throw error if user has no authorization', async () => {
+      // Arrange
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-456',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.verifyCommentAccess({
+        threadId: 'thread-123',
+        owner: 'user-456',
+      })).rejects.toThrowError('gagal karena anda tidak memiliki akses ke aksi ini');
+    });
+  });
+
+  describe('deleteCommentById', () => {
+    it('should be able to delete comment by id', async () => {
+      // Arrange
+      const addedComment = {
+        id: 'comment-123',
+        threadId: 'thread-123',
+      };
+
+      await CommentsTableTestHelper.addComment({
+        id: addedComment.id,
+        threadId: addedComment.threadId,
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action
+      await commentRepositoryPostgres.deleteCommentById(addedComment.id);
+      const comment = await CommentsTableTestHelper.findCommentsById('comment-123');
+
+      // Assert
+      expect(comment.is_deleted).toEqual(true);
+    });
+
+    it('should throw error when comment that want to be deleted does not exist', async () => {
+      // Arrange
+      const addedComment = 'comment-123';
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(
+        pool, {}, {},
+      );
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.deleteCommentById(addedComment.id))
+        .rejects.toThrowError('tidak bisa menghapus komentar karena komentar tidak ada');
     });
   });
 });
