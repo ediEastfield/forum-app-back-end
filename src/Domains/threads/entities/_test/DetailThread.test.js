@@ -8,6 +8,7 @@ describe('a DetailThread entities', () => {
       title: 'sebuah thread',
       body: 'belajar back end',
       date: '2021',
+      username: 'dicoding',
     };
 
     // Action and Assert
@@ -21,7 +22,8 @@ describe('a DetailThread entities', () => {
       title: true,
       body: {},
       date: [],
-      owner: 123,
+      username: 123,
+      comments: 'comments',
     };
 
     // Action and Assert
@@ -35,7 +37,8 @@ describe('a DetailThread entities', () => {
       title: 'sebuah thread',
       body: 'belajar back end',
       date: '2021',
-      owner: 'user-123',
+      username: 'dicoding',
+      comments: [],
     };
 
     // Action
@@ -46,6 +49,7 @@ describe('a DetailThread entities', () => {
     expect(detailThread.title).toEqual(payload.title);
     expect(detailThread.body).toEqual(payload.body);
     expect(detailThread.date).toEqual(payload.date);
-    expect(detailThread.owner).toEqual(payload.owner);
+    expect(detailThread.username).toEqual(payload.username);
+    expect(detailThread.comments).toEqual(payload.comments);
   });
 });

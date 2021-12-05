@@ -27,7 +27,10 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
   async getThreadById(id) {
     const query = {
-      text: 'SELECT * FROM threads WHERE id = $1',
+      text: `SELECT threads.id, title, body, date, username
+      FROM threads 
+      LEFT JOIN users ON users.id = threads.owner
+      WHERE threads.id = $1`,
       values: [id],
     };
 

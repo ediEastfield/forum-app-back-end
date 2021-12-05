@@ -76,7 +76,7 @@ describe('ThreadRepositoryPostgres', () => {
         title: 'sebuah thread',
         body: 'belajar back end',
         date: '2021',
-        owner: 'user-123',
+        username: 'dicoding',
       };
 
       const expectedThread = {
@@ -84,7 +84,7 @@ describe('ThreadRepositoryPostgres', () => {
         title: 'sebuah thread',
         body: 'belajar back end',
         date: '2021',
-        owner: 'user-123',
+        username: 'dicoding',
       };
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});

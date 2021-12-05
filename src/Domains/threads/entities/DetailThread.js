@@ -3,24 +3,32 @@ class DetailThread {
     this._verifyPayload(payload);
 
     const {
-      id, title, body, date, owner,
+      id, title, body, date, username, comments,
     } = payload;
 
     this.id = id;
     this.title = title;
     this.body = body;
     this.date = date;
-    this.owner = owner;
+    this.username = username;
+    this.comments = comments;
   }
 
   _verifyPayload({
-    id, title, body, date, owner,
+    id, title, body, date, username, comments,
   }) {
-    if (!id || !title || !body || !date || !owner) {
+    if (!id || !title || !body || !date || !username || !comments) {
       throw new Error('DETAIL_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof id !== 'string' || typeof title !== 'string' || typeof body !== 'string' || typeof date !== 'string' || typeof owner !== 'string') {
+    if (
+      typeof id !== 'string'
+      || typeof title !== 'string'
+      || typeof body !== 'string'
+      || typeof date !== 'string'
+      || typeof username !== 'string'
+      || !(Array.isArray(comments))
+    ) {
       throw new Error('DETAIL_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

@@ -2,6 +2,7 @@ const CommentRepository = require('../../Domains/comments/CommentRepository');
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const { mapCommentDbToModel, mapCommentDBToModel } = require('../../utils');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator, dateGenerator) {
@@ -66,6 +67,20 @@ class CommentRepositoryPostgres extends CommentRepository {
     if (!result.rowCount) {
       throw new NotFoundError('tidak bisa menghapus komentar karena komentar tidak ada');
     }
+  }
+
+  async getCommentByThreadId(id) {
+    const query = {
+      text: `SELECT comments.id, content, date, username, is_deleted
+      FROM comments
+      LEFT JOIN users
+      ON users.id = comments.owner
+      WHERE comments.thread_id = $1`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows.map(mapCommentDBToModel);
   }
 }
 

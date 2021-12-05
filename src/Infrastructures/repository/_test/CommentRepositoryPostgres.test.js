@@ -183,4 +183,34 @@ describe('CommentRepositoryPostgres', () => {
         .rejects.toThrowError('tidak bisa menghapus komentar karena komentar tidak ada');
     });
   });
+
+  describe('getCommentByThreadId function', () => {
+    it('should return comment', async () => {
+      // Arrange
+      const newComment = {
+        id: 'comment-123',
+        content: 'sebuah komentar',
+        date: '2021',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      };
+
+      const expectedComment = [{
+        id: 'comment-123',
+        content: 'sebuah komentar',
+        date: '2021',
+        username: 'dicoding',
+        isDeleted: false,
+      }];
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {}, {});
+      await CommentsTableTestHelper.addComment(newComment);
+
+      // Action
+      const getComment = await commentRepositoryPostgres.getCommentByThreadId('thread-123');
+
+      // Assert
+      expect(getComment).toStrictEqual(expectedComment);
+    });
+  });
 });
