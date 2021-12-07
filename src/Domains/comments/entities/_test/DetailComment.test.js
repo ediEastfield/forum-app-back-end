@@ -21,6 +21,7 @@ describe('a DetailComment entities', () => {
       date: {},
       content: [],
       isDeleted: 'false',
+      replies: 'replies',
     };
 
     // Action and Assert
@@ -35,6 +36,7 @@ describe('a DetailComment entities', () => {
       date: '2021',
       content: 'belajar back end',
       isDeleted: false,
+      replies: [],
     };
 
     // Action
@@ -46,5 +48,6 @@ describe('a DetailComment entities', () => {
     expect(detailComment.date).toEqual(payload.date);
     expect(detailComment.content).toEqual(payload.content);
     expect(detailComment.isDeleted).toEqual(payload.isDeleted);
+    expect(detailComment.replies).toEqual(payload.replies);
   });
 });

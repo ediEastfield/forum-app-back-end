@@ -12,6 +12,23 @@ const mapCommentDBToModel = ({
   date,
   isDeleted: is_deleted,
   username,
+  replies: [],
 });
 
-module.exports = { mapCommentDBToModel };
+const mapReplyDBToModel = ({
+  id,
+  content,
+  date,
+  is_deleted,
+  comment_id,
+  username,
+}) => ({
+  id,
+  content,
+  date,
+  isDeleted: is_deleted,
+  commentId: comment_id,
+  username,
+});
+
+module.exports = { mapCommentDBToModel, mapReplyDBToModel };

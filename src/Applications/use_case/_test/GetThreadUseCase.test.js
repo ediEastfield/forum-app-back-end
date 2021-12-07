@@ -1,5 +1,6 @@
 const DetailThread = require('../../../Domains/threads/entities/DetailThread');
 const DetailComment = require('../../../Domains/comments/entities/DetailComment');
+const DetailReply = require('../../../Domains/replies/entities/DetailReply');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const GetThreadUseCase = require('../GetThreadUseCase');
@@ -11,7 +12,7 @@ describe('GetThreadUseCase', () => {
       threadId: 'thread-123',
     };
 
-    const expectedDetailThread = new DetailThread({
+    const expectedThread = new DetailThread({
       id: 'thread-123',
       title: 'sebuah thread',
       body: 'belajar back end',
@@ -25,10 +26,82 @@ describe('GetThreadUseCase', () => {
         id: 'comment-123',
         username: 'dicoding',
         date: '2021',
-        content: 'sebuah komentar',
+        content: 'sebuah komentar A',
+        isDeleted: false,
+        replies: [],
+      }),
+      new DetailComment({
+        id: 'comment-456',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah komentar B',
+        isDeleted: false,
+        replies: [],
+      }),
+    ];
+
+    const expectedReplies = [
+      new DetailReply({
+        id: 'reply-123',
+        commentId: 'comment-123',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah balasan',
+        isDeleted: false,
+      }),
+      new DetailReply({
+        id: 'reply-456',
+        commentId: 'comment-456',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah balasan',
         isDeleted: false,
       }),
     ];
+
+    const expectedDetailThread = new DetailThread({
+      id: 'thread-123',
+      title: 'sebuah thread',
+      body: 'belajar back end',
+      date: '2021',
+      username: 'dicoding',
+      comments: [
+        new DetailComment({
+          id: 'comment-123',
+          username: 'dicoding',
+          date: '2021',
+          content: 'sebuah komentar A',
+          isDeleted: false,
+          replies: [
+            new DetailReply({
+              id: 'reply-123',
+              commentId: 'comment-123',
+              username: 'dicoding',
+              date: '2021',
+              content: 'sebuah balasan',
+              isDeleted: false,
+            }),
+          ],
+        }),
+        new DetailComment({
+          id: 'comment-456',
+          username: 'dicoding',
+          date: '2021',
+          content: 'sebuah komentar B',
+          isDeleted: false,
+          replies: [
+            new DetailReply({
+              id: 'reply-456',
+              commentId: 'comment-456',
+              username: 'dicoding',
+              date: '2021',
+              content: 'sebuah balasan',
+              isDeleted: false,
+            }),
+          ],
+        }),
+      ],
+    });
 
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository();
@@ -36,10 +109,12 @@ describe('GetThreadUseCase', () => {
 
     /** mocking needed function */
     mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedDetailThread));
+      .mockImplementation(() => Promise.resolve(expectedThread));
 
     mockCommentRepository.getCommentByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve(expectedComments));
+    mockCommentRepository.getRepliesCommentByThreadId = jest.fn()
+      .mockImplementation(() => Promise.resolve(expectedReplies));
 
     /** creating use case instance */
     const getThreadUseCase = new GetThreadUseCase({
@@ -52,10 +127,12 @@ describe('GetThreadUseCase', () => {
 
     // Assert
     expect(detailThread).toEqual(new DetailThread({
-      ...expectedDetailThread, comments: expectedComments,
+      ...expectedDetailThread,
     }));
 
     expect(mockThreadRepository.getThreadById).toBeCalledWith(useCaseParams.threadId);
     expect(mockCommentRepository.getCommentByThreadId).toBeCalledWith(useCaseParams.threadId);
+    expect(mockCommentRepository.getRepliesCommentByThreadId)
+      .toBeCalledWith(useCaseParams.threadId);
   });
 });

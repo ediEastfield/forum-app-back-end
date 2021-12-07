@@ -2,7 +2,7 @@ const CommentRepository = require('../../Domains/comments/CommentRepository');
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
-const { mapCommentDbToModel, mapCommentDBToModel } = require('../../utils');
+const { mapCommentDBToModel, mapReplyDBToModel } = require('../../utils');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator, dateGenerator) {
@@ -39,7 +39,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
     if (!result.rowCount) {
-      throw new NotFoundError('komentar yang anda cari tidak ditemukan');
+      throw new NotFoundError('thread atau komentar yang anda cari tidak ditemukan');
     }
   }
 
@@ -75,12 +75,29 @@ class CommentRepositoryPostgres extends CommentRepository {
       FROM comments
       LEFT JOIN users
       ON users.id = comments.owner
-      WHERE comments.thread_id = $1`,
+      WHERE comments.thread_id = $1
+      ORDER BY date ASC`,
       values: [id],
     };
 
     const result = await this._pool.query(query);
     return result.rows.map(mapCommentDBToModel);
+  }
+
+  async getRepliesCommentByThreadId(id) {
+    const query = {
+      text: `SELECT replies.id, replies.content, replies.date, username, replies.is_deleted, comment_id
+      FROM replies
+      INNER JOIN comments
+      ON comments.id = replies.comment_id
+      LEFT JOIN users
+      ON users.id = replies.owner
+      WHERE comments.thread_id = $1`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows.map(mapReplyDBToModel);
   }
 }
 

@@ -1,6 +1,7 @@
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const NewComment = require('../../../Domains/comments/entities/NewComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const pool = require('../../database/postgres/pool');
@@ -9,12 +10,14 @@ const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
     await CommentsTableTestHelper.cleanTable();
+    await RepliesTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
     await ThreadsTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
+    await RepliesTableTestHelper.cleanTable();
     await pool.end();
   });
 
@@ -201,6 +204,7 @@ describe('CommentRepositoryPostgres', () => {
         date: '2021',
         username: 'dicoding',
         isDeleted: false,
+        replies: [],
       }];
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {}, {});
@@ -211,6 +215,38 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       expect(getComment).toStrictEqual(expectedComment);
+    });
+  });
+
+  describe('getReplyCommentByThreadId function', () => {
+    it('should return reply', async () => {
+      // Arrange
+      const newReply = {
+        id: 'reply-123',
+        content: 'sebuah balasan',
+        date: '2021',
+        commentId: 'comment-123',
+        owner: 'user-123',
+      };
+
+      const expectedReply = [{
+        id: 'reply-123',
+        content: 'sebuah balasan',
+        date: '2021',
+        username: 'dicoding',
+        commentId: 'comment-123',
+        isDeleted: false,
+      }];
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {}, {});
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123', owner: 'user-123' });
+      await RepliesTableTestHelper.addReplies(newReply);
+
+      // Action
+      const getReplies = await commentRepositoryPostgres.getRepliesCommentByThreadId('thread-123');
+
+      // Assert
+      expect(getReplies).toStrictEqual(expectedReply);
     });
   });
 });
