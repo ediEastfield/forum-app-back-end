@@ -21,6 +21,7 @@ describe('a DetailReply entities', () => {
       date: {},
       content: [],
       isDeleted: 'false',
+      commentId: 123,
     };
 
     // Action and Assert
@@ -35,6 +36,7 @@ describe('a DetailReply entities', () => {
       date: '2021',
       content: 'sebuah balasan',
       isDeleted: false,
+      commentId: 'comment-123',
     };
 
     // Action
@@ -46,5 +48,6 @@ describe('a DetailReply entities', () => {
     expect(detailReply.date).toEqual(payload.date);
     expect(detailReply.content).toEqual(payload.content);
     expect(detailReply.isDeleted).toEqual(payload.isDeleted);
+    expect(detailReply.commentId).toEqual(payload.commentId);
   });
 });

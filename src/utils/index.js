@@ -20,15 +20,15 @@ const mapReplyDBToModel = ({
   content,
   date,
   is_deleted,
-  comment_id,
   username,
+  comment_id,
 }) => ({
   id,
   content,
   date,
   isDeleted: is_deleted,
-  commentId: comment_id,
   username,
+  commentId: comment_id,
 });
 
 module.exports = { mapCommentDBToModel, mapReplyDBToModel };

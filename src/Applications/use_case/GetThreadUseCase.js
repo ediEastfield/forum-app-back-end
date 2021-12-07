@@ -13,7 +13,6 @@ class GetThreadUseCase {
     detailThread.comments = this._checkIsDeletedComments(detailThread.comments);
     detailThread.comments = this._getRepliesComments(detailThread.comments, repliesComments);
 
-    console.log(repliesComments);
     return detailThread;
   }
 
@@ -27,9 +26,14 @@ class GetThreadUseCase {
 
   _getRepliesComments(comments, repliesComments) {
     for (let i = 0; i < comments.length; i++) {
-      const commentId = comments[i].id;
       // eslint-disable-next-line no-param-reassign
-      comments[i].replies = repliesComments.filter((reply) => reply.commentId === commentId);
+      comments[i].replies = repliesComments
+        .filter((reply) => reply.commentId === comments[i].id)
+        .map((reply) => {
+          // eslint-disable-next-line no-param-reassign
+          reply.content = reply.isDeleted ? '**komentar telah dihapus**' : reply.content;
+          return reply;
+        });
     }
     return comments;
   }
