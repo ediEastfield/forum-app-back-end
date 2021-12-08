@@ -4,6 +4,11 @@ const routes = (handler) => ([
     path: '/threads/{threadId}/comments/{commentId}/replies',
     handler: handler.postReplyHandler,
   },
+  {
+    method: 'DELETE',
+    path: '/threads/{threadId}/comments/{commentId}/replies/{replyId}',
+    handler: handler.deleteReplyByIdHandler,
+  },
 ]);
 
 module.exports = routes;

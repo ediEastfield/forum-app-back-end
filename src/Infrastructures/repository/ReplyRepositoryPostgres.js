@@ -26,6 +26,54 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const result = await this._pool.query(query);
     return new AddedReply({ ...result.rows[0] });
   }
+
+  async checkReplyIsExist({ threadId, commentId, replyId }) {
+    const query = {
+      text: `SELECT 1
+      FROM replies
+      INNER JOIN comments
+      ON replies.comment_id = comments.id
+      WHERE comments.thread_id = $1
+      AND comments.id = $2
+      AND replies.id = $3
+      AND replies.is_deleted = false`,
+      values: [threadId, commentId, replyId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('balasan yang anda cari tidak ditemukan');
+    }
+  }
+
+  async verifyReplyAccess({ ownerId, replyId }) {
+    const query = {
+      text: `SELECT 1 
+      FROM replies 
+      WHERE id = $1 
+      AND owner = $2`,
+      values: [replyId, ownerId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new AuthorizationError('gagal karena anda tidak memiliki akses ke aksi ini');
+    }
+  }
+
+  async deleteReplyById(replyId) {
+    const query = {
+      text: 'UPDATE replies SET is_deleted = true WHERE id = $1',
+      values: [replyId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('tidak bisa menghapus balasan karena balasan tidak ada');
+    }
+  }
 }
 
 module.exports = ReplyRepositoryPostgres;

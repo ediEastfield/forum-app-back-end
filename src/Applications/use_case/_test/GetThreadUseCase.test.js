@@ -12,7 +12,7 @@ describe('GetThreadUseCase', () => {
       threadId: 'thread-123',
     };
 
-    const expectedThread = new DetailThread({
+    const expectedDetailThread = new DetailThread({
       id: 'thread-123',
       title: 'sebuah thread',
       body: 'belajar back end',
@@ -59,49 +59,26 @@ describe('GetThreadUseCase', () => {
       }),
     ];
 
-    const expectedDetailThread = new DetailThread({
-      id: 'thread-123',
-      title: 'sebuah thread',
-      body: 'belajar back end',
-      date: '2021',
-      username: 'dicoding',
-      comments: [
-        new DetailComment({
-          id: 'comment-123',
-          username: 'dicoding',
-          date: '2021',
-          content: 'sebuah komentar A',
-          isDeleted: false,
-          replies: [
-            new DetailReply({
-              id: 'reply-123',
-              commentId: 'comment-123',
-              username: 'dicoding',
-              date: '2021',
-              content: 'sebuah balasan',
-              isDeleted: false,
-            }),
-          ],
-        }),
-        new DetailComment({
-          id: 'comment-456',
-          username: 'dicoding',
-          date: '2021',
-          content: 'sebuah komentar B',
-          isDeleted: false,
-          replies: [
-            new DetailReply({
-              id: 'reply-456',
-              commentId: 'comment-456',
-              username: 'dicoding',
-              date: '2021',
-              content: 'sebuah balasan',
-              isDeleted: false,
-            }),
-          ],
-        }),
-      ],
-    });
+    const {
+      ...filterCommentA
+    } = expectedComments[0];
+
+    const {
+      ...filterCommentB
+    } = expectedComments[1];
+
+    const {
+      ...filterReplyA
+    } = expectedReplies[0];
+
+    const {
+      ...filterReplyB
+    } = expectedReplies[1];
+
+    const expectedRepliesComment = [
+      { ...filterCommentA, replies: [filterReplyA] },
+      { ...filterCommentB, replies: [filterReplyB] },
+    ];
 
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository();
@@ -109,7 +86,7 @@ describe('GetThreadUseCase', () => {
 
     /** mocking needed function */
     mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedThread));
+      .mockImplementation(() => Promise.resolve(expectedDetailThread));
 
     mockCommentRepository.getCommentByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve(expectedComments));
@@ -128,6 +105,7 @@ describe('GetThreadUseCase', () => {
     // Assert
     expect(detailThread).toEqual(new DetailThread({
       ...expectedDetailThread,
+      comments: expectedRepliesComment,
     }));
 
     expect(mockThreadRepository.getThreadById).toBeCalledWith(useCaseParams.threadId);

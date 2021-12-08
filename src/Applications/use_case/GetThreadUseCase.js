@@ -31,7 +31,7 @@ class GetThreadUseCase {
         .filter((reply) => reply.commentId === comments[i].id)
         .map((reply) => {
           // eslint-disable-next-line no-param-reassign
-          reply.content = reply.isDeleted ? '**komentar telah dihapus**' : reply.content;
+          reply.content = reply.isDeleted ? '**balasan telah dihapus**' : reply.content;
           return reply;
         });
     }
