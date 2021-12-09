@@ -113,4 +113,129 @@ describe('GetThreadUseCase', () => {
     expect(mockCommentRepository.getRepliesCommentByThreadId)
       .toBeCalledWith(useCaseParams.threadId);
   });
+
+  it('_checkIsDeletedComments function', () => {
+    // Arrange
+    const getThreadUseCase = new GetThreadUseCase(
+      { threadRepository: {}, commentRepository: {} },
+    );
+
+    const expectedComments = [
+      new DetailComment({
+        id: 'comment-123',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah komentar A',
+        isDeleted: true,
+        replies: [],
+      }),
+      new DetailComment({
+        id: 'comment-456',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah komentar B',
+        isDeleted: false,
+        replies: [],
+      }),
+    ];
+
+    const {
+      ...filterCommentA
+    } = expectedComments[0];
+
+    const {
+      ...filterCommentB
+    } = expectedComments[1];
+
+    const spyCheckIsDeletedComments = jest.spyOn(getThreadUseCase, '_checkIsDeletedComments');
+
+    // Action
+    getThreadUseCase._checkIsDeletedComments(expectedComments);
+
+    // Assert
+    expect(spyCheckIsDeletedComments)
+      .toReturnWith([
+        { ...filterCommentA, content: '**komentar telah dihapus**' },
+        filterCommentB,
+      ]);
+
+    spyCheckIsDeletedComments.mockClear();
+  });
+
+  it('_getRepliesComments function', () => {
+    // Arrange
+    const getThreadUseCase = new GetThreadUseCase(
+      { threadRepository: {}, commentRepository: {} },
+    );
+
+    const expectedComments = [
+      new DetailComment({
+        id: 'comment-123',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah komentar A',
+        isDeleted: false,
+        replies: [],
+      }),
+      new DetailComment({
+        id: 'comment-456',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah komentar B',
+        isDeleted: false,
+        replies: [],
+      }),
+    ];
+
+    const expectedReplies = [
+      new DetailReply({
+        id: 'reply-123',
+        commentId: 'comment-123',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah balasan',
+        isDeleted: true,
+      }),
+      new DetailReply({
+        id: 'reply-456',
+        commentId: 'comment-456',
+        username: 'dicoding',
+        date: '2021',
+        content: 'sebuah balasan',
+        isDeleted: false,
+      }),
+    ];
+
+    const {
+      ...filterCommentA
+    } = expectedComments[0];
+
+    const {
+      ...filterCommentB
+    } = expectedComments[1];
+
+    const {
+      ...filterReplyA
+    } = expectedReplies[0];
+
+    const {
+      ...filterReplyB
+    } = expectedReplies[1];
+
+    const expectedRepliesComment = [
+      { ...filterCommentA, replies: [{ ...filterReplyA, content: '**balasan telah dihapus**' }] },
+      { ...filterCommentB, replies: [filterReplyB] },
+    ];
+
+    const spyGetRepliesComments = jest.spyOn(getThreadUseCase, '_getRepliesComments');
+
+    // Action
+    getThreadUseCase._getRepliesComments(expectedComments, expectedReplies);
+
+    // Assert
+    expect(spyGetRepliesComments)
+      .toReturnWith(expectedRepliesComment);
+
+    spyGetRepliesComments.mockClear();
+  });
 });
