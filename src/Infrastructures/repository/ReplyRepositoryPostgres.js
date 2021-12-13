@@ -2,6 +2,7 @@ const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const { mapReplyDBToModel } = require('../../utils');
 
 class ReplyRepositoryPostgres extends ReplyRepository {
   constructor(pool, idGenerator, dateGenerator) {
@@ -73,6 +74,23 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     if (!result.rowCount) {
       throw new NotFoundError('tidak bisa menghapus balasan karena balasan tidak ada');
     }
+  }
+
+  async getRepliesCommentByThreadId(id) {
+    const query = {
+      text: `SELECT replies.id, replies.content, replies.date, username, replies.is_deleted, comment_id
+      FROM replies
+      INNER JOIN comments
+      ON comments.id = replies.comment_id
+      LEFT JOIN users
+      ON users.id = replies.owner
+      WHERE comments.thread_id = $1
+      ORDER BY date ASC`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows.map(mapReplyDBToModel);
   }
 }
 

@@ -217,36 +217,4 @@ describe('CommentRepositoryPostgres', () => {
       expect(getComment).toStrictEqual(expectedComment);
     });
   });
-
-  describe('getReplyCommentByThreadId function', () => {
-    it('should return reply', async () => {
-      // Arrange
-      const newReply = {
-        id: 'reply-123',
-        content: 'sebuah balasan',
-        date: '2021',
-        commentId: 'comment-123',
-        owner: 'user-123',
-      };
-
-      const expectedReply = [{
-        id: 'reply-123',
-        content: 'sebuah balasan',
-        date: '2021',
-        username: 'dicoding',
-        commentId: 'comment-123',
-        isDeleted: false,
-      }];
-
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {}, {});
-      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123', owner: 'user-123' });
-      await RepliesTableTestHelper.addReplies(newReply);
-
-      // Action
-      const getReplies = await commentRepositoryPostgres.getRepliesCommentByThreadId('thread-123');
-
-      // Assert
-      expect(getReplies).toStrictEqual(expectedReply);
-    });
-  });
 });

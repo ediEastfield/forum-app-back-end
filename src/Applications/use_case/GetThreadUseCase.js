@@ -1,14 +1,15 @@
 class GetThreadUseCase {
-  constructor({ threadRepository, commentRepository }) {
+  constructor({ threadRepository, commentRepository, replyRepository }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
+    this._replyRepository = replyRepository;
   }
 
   async execute(useCaseParams) {
     const { threadId } = useCaseParams;
     const detailThread = await this._threadRepository.getThreadById(threadId);
     detailThread.comments = await this._commentRepository.getCommentByThreadId(threadId);
-    const repliesComments = await this._commentRepository.getRepliesCommentByThreadId(threadId);
+    const repliesComments = await this._replyRepository.getRepliesCommentByThreadId(threadId);
 
     detailThread.comments = this._checkIsDeletedComments(detailThread.comments);
     detailThread.comments = this._getRepliesComments(detailThread.comments, repliesComments);
@@ -17,18 +18,21 @@ class GetThreadUseCase {
   }
 
   _checkIsDeletedComments(comments) {
-    for (let i = 0; i < comments.length; i++) {
-      // eslint-disable-next-line no-param-reassign
-      comments[i].content = comments[i].isDeleted ? '**komentar telah dihapus**' : comments[i].content;
-    }
-    return comments;
+    return comments.map((comment) => {
+      if (comment.isDeleted) {
+        // eslint-disable-next-line no-param-reassign
+        comment.content = '**komentar telah dihapus**';
+      }
+      return comment;
+    });
   }
 
   _getRepliesComments(comments, repliesComments) {
-    for (let i = 0; i < comments.length; i++) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comment of comments) {
       // eslint-disable-next-line no-param-reassign
-      comments[i].replies = repliesComments
-        .filter((reply) => reply.commentId === comments[i].id)
+      comment.replies = repliesComments
+        .filter((reply) => reply.commentId === comment.id)
         .map((reply) => {
           // eslint-disable-next-line no-param-reassign
           reply.content = reply.isDeleted ? '**balasan telah dihapus**' : reply.content;

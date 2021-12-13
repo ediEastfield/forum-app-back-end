@@ -18,10 +18,6 @@ class CommentRepository {
   async getCommentByThreadId(threadId) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
-
-  async getRepliesCommentByThreadId(threadId) {
-    throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
-  }
 }
 
 module.exports = CommentRepository;

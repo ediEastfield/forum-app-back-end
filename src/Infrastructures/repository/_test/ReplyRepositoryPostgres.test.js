@@ -189,4 +189,35 @@ describe('ReplyRepositoryPostgres', () => {
         .rejects.toThrowError('tidak bisa menghapus balasan karena balasan tidak ada');
     });
   });
+
+  describe('getReplyCommentByThreadId function', () => {
+    it('should return reply', async () => {
+      // Arrange
+      const newReply = {
+        id: 'reply-123',
+        content: 'sebuah balasan',
+        date: '2021',
+        commentId: 'comment-123',
+        owner: 'user-123',
+      };
+
+      const expectedReply = [{
+        id: 'reply-123',
+        content: 'sebuah balasan',
+        date: '2021',
+        username: 'dicoding',
+        commentId: 'comment-123',
+        isDeleted: false,
+      }];
+
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {}, {});
+      await RepliesTableTestHelper.addReplies(newReply);
+
+      // Action
+      const getReplies = await replyRepositoryPostgres.getRepliesCommentByThreadId('thread-123');
+
+      // Assert
+      expect(getReplies).toStrictEqual(expectedReply);
+    });
+  });
 });

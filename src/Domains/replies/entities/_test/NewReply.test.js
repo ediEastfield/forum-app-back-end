@@ -38,5 +38,7 @@ describe('a NewReplies entities', () => {
     // Assert
     expect(newReply).toBeInstanceOf(NewReply);
     expect(newReply.content).toEqual(payload.content);
+    expect(newReply.commentId).toEqual(payload.commentId);
+    expect(newReply.owner).toEqual(payload.owner);
   });
 });

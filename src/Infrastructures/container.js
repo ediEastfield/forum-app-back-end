@@ -248,6 +248,10 @@ container.register([
           name: 'commentRepository',
           internal: CommentRepository.name,
         },
+        {
+          name: 'replyRepository',
+          internal: ReplyRepository.name,
+        },
       ],
     },
   },
@@ -264,10 +268,6 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         },
       ],
     },
@@ -302,10 +302,6 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         },
       ],
     },
