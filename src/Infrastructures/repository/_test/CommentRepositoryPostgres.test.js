@@ -205,6 +205,7 @@ describe('CommentRepositoryPostgres', () => {
         username: 'dicoding',
         isDeleted: false,
         replies: [],
+        likeCount: 0,
       }];
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {}, {});

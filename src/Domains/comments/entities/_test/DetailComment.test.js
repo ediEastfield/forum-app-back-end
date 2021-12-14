@@ -22,6 +22,7 @@ describe('a DetailComment entities', () => {
       content: [],
       isDeleted: 'false',
       replies: 'replies',
+      likeCount: true,
     };
 
     // Action and Assert
@@ -37,6 +38,7 @@ describe('a DetailComment entities', () => {
       content: 'belajar back end',
       isDeleted: false,
       replies: [],
+      likeCount: 1,
     };
 
     // Action
@@ -49,5 +51,6 @@ describe('a DetailComment entities', () => {
     expect(detailComment.content).toEqual(payload.content);
     expect(detailComment.isDeleted).toEqual(payload.isDeleted);
     expect(detailComment.replies).toEqual(payload.replies);
+    expect(detailComment.likeCount).toEqual(payload.likeCount);
   });
 });

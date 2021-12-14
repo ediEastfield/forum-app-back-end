@@ -1,8 +1,11 @@
 class GetThreadUseCase {
-  constructor({ threadRepository, commentRepository, replyRepository }) {
+  constructor({
+    threadRepository, commentRepository, replyRepository, likeRepository,
+  }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._replyRepository = replyRepository;
+    this._likeRepository = likeRepository;
   }
 
   async execute(useCaseParams) {
@@ -13,6 +16,7 @@ class GetThreadUseCase {
 
     detailThread.comments = this._checkIsDeletedComments(detailThread.comments);
     detailThread.comments = this._getRepliesComments(detailThread.comments, repliesComments);
+    detailThread.comments = await this._getLikeCountComments(detailThread.comments);
 
     return detailThread;
   }
@@ -38,6 +42,15 @@ class GetThreadUseCase {
           reply.content = reply.isDeleted ? '**balasan telah dihapus**' : reply.content;
           return reply;
         });
+    }
+    return comments;
+  }
+
+  async _getLikeCountComments(comments) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comment of comments) {
+      // eslint-disable-next-line no-await-in-loop
+      comment.likeCount = await this._likeRepository.getCountLikeByCommentId(comment.id);
     }
     return comments;
   }

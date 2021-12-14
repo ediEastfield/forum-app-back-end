@@ -13,6 +13,7 @@ const mapCommentDBToModel = ({
   isDeleted: is_deleted,
   username,
   replies: [],
+  likeCount: 0,
 });
 
 const mapReplyDBToModel = ({
