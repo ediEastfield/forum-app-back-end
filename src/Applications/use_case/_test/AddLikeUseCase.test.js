@@ -62,8 +62,7 @@ describe('AddLikeUseCase', () => {
     mockLikeRepository.deleteLikeByCommentIdAndOwner = jest.fn()
       .mockImplementation(() => Promise.resolve());
 
-    mockCommentRepository.checkCommentIsExist = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.checkCommentIsExist = jest.fn(() => Promise.resolve(false));
 
     /** creating use case instance */
     const addLikeUseCase = new AddLikeUseCase({
